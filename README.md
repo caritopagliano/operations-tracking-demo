@@ -5,7 +5,7 @@ An end-to-end, lightweight operational framework designed to resolve citizen int
 ## 🚀 Live Interactive Demos
 - **App 1: Intake & Eligibility Triage:** [Live Demo](https://caritopagliano.github.io/operations-tracking-demo/)
 - **App 2: Bilingual Confirmation Generator:** [Live Demo](https://caritopagliano.github.io/operations-tracking-demo/appointment-email-generator-demo.html)
-- **App 3: Daily Intake Data Normalizer:** [Live Demo](https://caritopagliano.github.io/operations-tracking-demo/daily-intake-data-normalizer-demo.html))
+- **App 3: Daily Intake Data Normalizer:** [Live Demo](https://caritopagliano.github.io/operations-tracking-demo/daily-intake-data-normalizer-demo.html)
 
 ## 📁 Repository Artifacts
 - `operations-tracking-matrix-demo.xlsx`: Multi-tab tracking spreadsheet with automated SLA aging logic and batch scan logging.
