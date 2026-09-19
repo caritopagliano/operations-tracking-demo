@@ -8,8 +8,8 @@ An end-to-end, lightweight operational framework designed to resolve citizen int
 - **App 3: Daily Intake Data Normalizer:** [Live Demo](https://caritopagliano.github.io/operations-tracking-demo/daily-intake-data-normalizer-demo.html)
 
 ## 📁 Repository Artifacts
-- `operations-tracking-matrix-demo.xlsx`: Multi-tab tracking spreadsheet with automated SLA aging logic and batch scan logging.
-- `standard-operating-procedure-sop-demo.pdf`: 1-page visual desk manual (SOP) standardising operational workflows.
+- **[Standard Operating Procedure (SOP) Manual (PDF)](./standard-operating-procedure-sop-demo.pdf)**: 1-page visual desk manual standardising operational workflows across all 4 stages.
+- **[Operations Tracking Matrix (Excel .xlsx)](./operations-tracking-matrix-demo.xlsx)**: Multi-tab tracking spreadsheet with automated SLA aging logic, batch scan logging, and an executive KPI summary dashboard.
 
 ## 🛠️ Key Methodologies & Competencies
 - Business Process Improvement (BPI) & Workflow Architecture
