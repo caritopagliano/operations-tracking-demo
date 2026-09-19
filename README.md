@@ -13,7 +13,7 @@ An end-to-end operational framework designed to resolve citizen intake bottlenec
 
 ## 📊 Operations Hub: Executive Dashboard & Tracking Matrix
 
-![Executive Dashboard Preview](https://caritopagliano.github.io/operations-tracking-demo/dashboard-preview.jpg)
+![Executive Dashboard Preview](https://caritopagliano.github.io/operations-tracking-demo/dashboard-preview.png)
 
 ### 🔗 Spreadsheet Model & Governance:
 - **[Interactive Google Sheets (Live Web Preview)](https://docs.google.com/spreadsheets/d/1xzHYt2N249V33yz2WzebO4KB775dw9X5/preview)** *(Click to view all 4 tabs, formulas, and dynamic SLA status flags directly in your browser)*
