@@ -27,9 +27,3 @@ An end-to-end operational framework designed to resolve citizen intake bottlenec
 ---
 
 ## 🏗️ Architecture & Operational Lifecycle
-
-## 🛠️ Core Methodologies & Competencies
-- Business Process Improvement (BPI) & Workflow Architecture
-- Management by Exception (MBE) & SLA Lifecycle Governance
-- AI-Assisted Rapid Tooling & Prompt Engineering (Google AI Professional Certified)
-- Standard Operating Procedure (SOP) & Desk Manual Design
