@@ -3,7 +3,7 @@
 An end-to-end, lightweight operational framework designed to resolve citizen intake bottlenecks, automate bilingual communications, and establish proactive SLA case tracking.
 
 ## 🚀 Live Interactive Demos
-- **App 1: Intake & Eligibility Triage:** [Live Demo](https://tu-usuario.github.io/consular-operations-suite/)
+- **App 1: Intake & Eligibility Triage:** [Live Demo](https://caritopagliano.github.io/operations-tracking-demo/)
 - **App 2: Bilingual Confirmation Generator:** [Live Demo](https://tu-usuario.github.io/consular-operations-suite/appointment-email-generator-demo.html)
 - **App 3: Daily Intake Data Normalizer:** [Live Demo](https://tu-usuario.github.io/consular-operations-suite/daily-intake-data-normalizer-demo.html)
 
