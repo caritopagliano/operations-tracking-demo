@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEMO | Consular Appointment & Eligibility Triage Assistant</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-dark: #0f172a;
+      --accent: #059669;
+      --accent-hover: #047857;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --info-bg: #eff6ff;
+      --info-border: #bfdbfe;
+      --info-text: #1d4ed8;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+      --warning-text: #b45309;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 28px 16px; line-height: 1.5; }
+    .container { max-width: 680px; margin: 0 auto; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 1px solid var(--border); overflow: hidden; }
+
+    .top-badge {
+      background: #0f172a; color: #94a3b8; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; padding: 6px 16px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .top-badge span.demo-tag { background: #3b82f6; color: white; padding: 2px 8px; border-radius: 4px; }
+
+    .header { background: linear-gradient(135deg, var(--primary), #1e40af); color: white; padding: 24px 20px; text-align: center; }
+    .header h1 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; }
+    .header p { font-size: 0.9rem; opacity: 0.9; }
+
+    .content { padding: 24px; }
+    .step-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 14px; color: var(--primary); }
+
+    .options-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+    .option-card {
+      border: 1.5px solid var(--border); border-radius: 8px; padding: 14px 16px; cursor: pointer;
+      display: flex; align-items: center; gap: 12px; transition: all 0.2s ease;
+    }
+    .option-card:hover { border-color: #93c5fd; background-color: #f0f7ff; }
+    .option-card input[type="radio"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+    .option-card label { cursor: pointer; font-size: 0.95rem; font-weight: 600; color: #1e293b; flex: 1; }
+
+    .panel { display: none; border-radius: 8px; padding: 20px; animation: fadeIn 0.25s ease; margin-top: 10px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .panel-direct { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .panel-review { background: var(--warning-bg); border: 1px solid var(--warning-border); }
+
+    .box-info { background: white; border-radius: 6px; padding: 14px; border: 1px solid var(--border); margin-bottom: 16px; font-size: 0.88rem; }
+    .box-info strong { color: var(--primary); display: block; margin-bottom: 6px; }
+    .box-info ul { margin-left: 18px; color: #334155; }
+    .box-info li { margin-bottom: 4px; }
+
+    .btn {
+      display: inline-block; width: 100%; text-align: center; padding: 12px 18px; border-radius: 6px;
+      font-size: 0.92rem; font-weight: 700; cursor: pointer; border: none; text-decoration: none; transition: 0.15s;
+    }
+    .btn-booking { background-color: var(--accent); color: white; }
+    .btn-booking:hover { background-color: var(--accent-hover); }
+    .btn-copy { background-color: var(--primary); color: white; margin-top: 10px; }
+    .btn-copy:hover { background-color: #1e40af; }
+
+    .template-box { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 14px; font-family: monospace; font-size: 0.82rem; white-space: pre-wrap; color: #334155; line-height: 1.45; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.88rem; display: none; z-index: 100; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="top-badge">
+    <span>Internal Tooling Prototype</span>
+    <span class="demo-tag">DEMO</span>
+  </div>
+
+  <div class="header">
+    <h1>Consular Appointment & Eligibility Triage</h1>
+    <p>Interactive self-service triage to verify prerequisites prior to booking</p>
+  </div>
+
+  <div class="content">
+    <div class="step-title">Select the service required:</div>
+
+    <div class="options-group">
+      <div class="option-card" onclick="selectRoute('renewal')">
+        <input type="radio" id="opt_renewal" name="triage" value="renewal">
+        <label for="opt_renewal">A) ID Card or Passport Renewal (Standard Biometric)</label>
+      </div>
+
+      <div class="option-card" onclick="selectRoute('lost')">
+        <input type="radio" id="opt_lost" name="triage" value="lost">
+        <label for="opt_lost">B) Lost / Stolen Document Replacement</label>
+      </div>
+
+      <div class="option-card" onclick="selectRoute('first')">
+        <input type="radio" id="opt_first" name="triage" value="first">
+        <label for="opt_first">C) First ID Card Registration (Legacy Records / Verification Required)</label>
+      </div>
+    </div>
+
+    <!-- Panel A: Renewal -->
+    <div id="panel-renewal" class="panel panel-direct">
+      <h3 style="color: #15803d; margin-bottom: 10px;">Eligible for Direct Online Booking</h3>
+      <div class="box-info">
+        <strong>Mandatory Prerequisites for Your Appointment:</strong>
+        <ul>
+          <li>Latest physical ID card or passport (original).</li>
+          <li>Debit card for fee settlement upon capture of biometrics.</li>
+          <li>One booking slot per family member.</li>
+        </ul>
+      </div>
+      <a href="https://booking-demo.consulate-portal.org" target="_blank" class="btn btn-booking">Proceed to Online Booking Calendar</a>
+    </div>
+
+    <!-- Panel B: Lost / Stolen -->
+    <div id="panel-lost" class="panel panel-direct">
+      <h3 style="color: #15803d; margin-bottom: 10px;">Eligible for Booking (Secondary Proof Required)</h3>
+      <div class="box-info">
+        <strong style="color: #b45309;">Mandatory Identity Verification:</strong>
+        <ul>
+          <li>Official police theft / loss report.</li>
+          <li>Secondary proof of citizenship (e.g. Certified Full Birth Certificate or expired document copy).</li>
+          <li>One (1) recent 4x4 cm passport photograph with a white background.</li>
+        </ul>
+      </div>
+      <a href="https://booking-demo.consulate-portal.org" target="_blank" class="btn btn-booking">Proceed to Online Booking Calendar</a>
+    </div>
+
+    <!-- Panel C: First ID -->
+    <div id="panel-first" class="panel panel-review">
+      <h3 style="color: #b45309; margin-bottom: 10px;">Prior Document Review Required</h3>
+      <p style="font-size: 0.88rem; color: #78350f; margin-bottom: 12px;">
+        To register a First ID Card or verify legacy archives, our consular case team must perform a preliminary registry lookup before allocating an in-person appointment slot.
+      </p>
+      <div class="template-box" id="email-template">SUBJECT: Preliminary Verification - First ID Card Application
+
+Dear Consular Operations Team,
+
+I request preliminary verification of my registry archives prior to booking an in-person appointment:
+
+- Full Name:
+- Date of Birth:
+- Place of Birth:
+- Contact Phone:
+- Attached Documents: Scanned certified birth record (PDF)
+
+Kind regards.</div>
+      <button type="button" class="btn btn-copy" onclick="copyTemplate()">Copy Email Template</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Copied to clipboard!</div>
+
+<script>
+  function selectRoute(route) {
+    document.getElementById('opt_' + route).checked = true;
+    document.getElementById('panel-renewal').style.display = 'none';
+    document.getElementById('panel-lost').style.display = 'none';
+    document.getElementById('panel-first').style.display = 'none';
+
+    if (route === 'renewal') document.getElementById('panel-renewal').style.display = 'block';
+    if (route === 'lost') document.getElementById('panel-lost').style.display = 'block';
+    if (route === 'first') document.getElementById('panel-first').style.display = 'block';
+  }
+
+  function copyTemplate() {
+    const text = document.getElementById('email-template').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const t = document.getElementById('toast');
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2000);
+    });
+  }
+</script>
+</body>
+</html>

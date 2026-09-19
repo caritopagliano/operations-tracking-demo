@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEMO | Automated Appointment Confirmation Generator</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-dark: #0f172a;
+      --accent: #059669;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 24px 16px; min-height: 100vh; }
+    .container { max-width: 1000px; margin: 0 auto; }
+
+    .top-badge {
+      background: #0f172a; color: #94a3b8; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; padding: 6px 16px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;
+    }
+    .demo-tag { background: #3b82f6; color: white; padding: 2px 8px; border-radius: 4px; }
+
+    header {
+      background: var(--card-bg); padding: 20px 24px; border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
+    }
+    h1 { font-size: 1.35rem; color: var(--primary); font-weight: 800; }
+    p.sub { font-size: 0.88rem; color: var(--text-muted); }
+
+    .layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; margin-top: 20px; }
+    .card { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 0.88rem; font-weight: 700; color: #334155; margin-bottom: 6px; }
+    input[type="text"], input[type="date"] {
+      width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.95rem; outline: none;
+    }
+    input:focus { border-color: var(--primary); }
+
+    .lang-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
+    .lang-btn {
+      flex: 1; padding: 8px; border: 1.5px solid var(--border); background: #f8fafc; border-radius: 6px;
+      font-weight: 700; font-size: 0.85rem; cursor: pointer; text-align: center;
+    }
+    .lang-btn.active { background: #eff6ff; border-color: var(--primary); color: var(--primary); }
+
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .time-btn {
+      padding: 9px; border: 1.5px solid var(--border); background: #f8fafc; border-radius: 6px;
+      font-weight: 700; font-size: 0.9rem; cursor: pointer; text-align: center;
+    }
+    .time-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .actions-grid { display: flex; flex-direction: column; gap: 10px; }
+    .btn-action {
+      display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border: 1.5px solid var(--border);
+      background: white; border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-action:hover { background: #f0f7ff; border-color: #93c5fd; transform: translateY(-1px); }
+    .badge-copy { font-size: 0.72rem; background: #e2e8f0; color: #334155; padding: 4px 8px; border-radius: 4px; }
+
+    .btn-emergency { color: #b91c1c; border-color: #fca5a5; }
+    .btn-emergency:hover { background: #fef2f2; border-color: #b91c1c; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #0f172a; color: white; padding: 12px 24px; border-radius: 30px; font-size: 0.92rem;
+      font-weight: 600; display: none; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="top-badge">
+    <span>Internal Tooling Prototype</span>
+    <span class="demo-tag">DEMO</span>
+  </div>
+
+  <header>
+    <div>
+      <h1>Consular Confirmation Generator</h1>
+      <p class="sub">1-Click bilingual communications & mandatory checklist dispatch</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="card">
+      <div class="form-group">
+        <label>Language Output</label>
+        <div class="lang-toggle">
+          <button type="button" class="lang-btn active" id="btnEn" onclick="setLang('en')">🇬🇧 English (UK)</button>
+          <button type="button" class="lang-btn" id="btnEs" onclick="setLang('es')">🇪🇸 Spanish</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="applicantName">Applicant Full Name (Optional)</label>
+        <input type="text" id="applicantName" placeholder="e.g. Eleanor Vance">
+      </div>
+
+      <div class="form-group">
+        <label for="appointmentDate">Appointment Date</label>
+        <input type="date" id="appointmentDate">
+      </div>
+
+      <div class="form-group">
+        <label>Appointment Time</label>
+        <div class="time-grid">
+          <button type="button" class="time-btn active" onclick="selectTime('10:00', this)">10:00 AM</button>
+          <button type="button" class="time-btn" onclick="selectTime('11:00', this)">11:00 AM</button>
+          <button type="button" class="time-btn" onclick="selectTime('12:00', this)">12:00 PM</button>
+          <button type="button" class="time-btn" onclick="selectTime('02:00', this)">02:00 PM</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size: 1rem; color: #475569; text-transform: uppercase; margin-bottom: 14px; letter-spacing: 0.5px;">Select Service to Copy Formatted Email:</h2>
+      
+      <div class="actions-grid">
+        <button type="button" class="btn-action" onclick="generateEmail('adult_passport')">
+          <span>📘 ADULT PASSPORT RENEWAL</span>
+          <span class="badge-copy">COPY EMAIL</span>
+        </button>
+
+        <button type="button" class="btn-action" onclick="generateEmail('child_passport')">
+          <span>👶 CHILD FIRST PASSPORT / RENEWAL</span>
+          <span class="badge-copy">COPY EMAIL</span>
+        </button>
+
+        <button type="button" class="btn-action" onclick="generateEmail('id_renewal')">
+          <span>🪪 NATIONAL ID CARD RENEWAL</span>
+          <span class="badge-copy">COPY EMAIL</span>
+        </button>
+
+        <button type="button" class="btn-action btn-emergency" onclick="generateEmail('emergency_doc')">
+          <span>🚨 EMERGENCY TRAVEL DOCUMENT</span>
+          <span class="badge-copy">COPY EMAIL</span>
+        </button>
+      </div>
+
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 20px; line-height: 1.4;">
+        💡 <strong>Productivity Note:</strong> Clicking any button instantly copies the rich HTML body and Subject directly into your clipboard. Paste into Outlook / Gmail (Ctrl+V) ready for dispatch.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Formatted email copied to clipboard!</div>
+
+<script>
+  let currentLang = 'en';
+  let selectedTime = '10:00 AM';
+
+  document.getElementById('appointmentDate').valueAsDate = new Date();
+
+  function setLang(lang) {
+    currentLang = lang;
+    document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+    document.getElementById('btnEs').classList.toggle('active', lang === 'es');
+  }
+
+  function selectTime(time, btn) {
+    selectedTime = time;
+    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function formatDate(isoStr, lang) {
+    if (!isoStr) return lang === 'en' ? 'THE SCHEDULED DATE' : 'LA FECHA ACORDADA';
+    const [y, m, d] = isoStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    return date.toLocaleDateString(lang === 'en' ? 'en-GB' : 'es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+  }
+
+  const templates = {
+    en: {
+      adult_passport: {
+        subject: "APPOINTMENT CONFIRMATION: ADULT PASSPORT RENEWAL - [DATE] AT [TIME]",
+        body: `Dear [NAME],<br><br>
+We are pleased to confirm your appointment for an <strong>ADULT BIOMETRIC PASSPORT</strong> on <strong style="color:#1e3a8a;">[DATE] AT [TIME]</strong>.<br><br>
+<strong>Mandatory Requirements:</strong>
+<ol style="margin-left: 18px; margin-top: 6px; line-height: 1.6;">
+  <li><strong>Previous Passport:</strong> Original booklet (cancelled upon processing; valid visas remain intact).</li>
+  <li><strong>National ID Card:</strong> Original valid card.</li>
+  <li><strong>Consular Fee:</strong> £130.00 approx. (Debit card only on appointment day).</li>
+</ol>
+<br>
+<strong>Turnaround:</strong> 8 to 12 weeks. You will receive an automated notification once your physical document arrives at the post for collection.<br><br>
+Kind regards,<br>
+<strong>Consular Operations Section</strong>`
+      },
+      child_passport: {
+        subject: "APPOINTMENT CONFIRMATION: CHILD PASSPORT - [DATE] AT [TIME]",
+        body: `Dear [NAME],<br><br>
+We confirm the appointment for a <strong>CHILD PASSPORT</strong> on <strong style="color:#1e3a8a;">[DATE] AT [TIME]</strong>.<br><br>
+<strong>Mandatory Requirements:</strong>
+<ol style="margin-left: 18px; margin-top: 6px; line-height: 1.6;">
+  <li><strong>Attendance:</strong> The minor and <strong>both parents</strong> must attend in person.</li>
+  <li><strong>Birth Record:</strong> Certified long-form original birth certificate.</li>
+  <li><strong>Parental Photo ID:</strong> Valid original passports or national ID cards of both parents.</li>
+  <li><strong>Fee:</strong> £130.00 approx. (Debit card on the day).</li>
+</ol>
+<br>
+Kind regards,<br>
+<strong>Consular Operations Section</strong>`
+      },
+      id_renewal: {
+        subject: "APPOINTMENT CONFIRMATION: NATIONAL ID RENEWAL - [DATE] AT [TIME]",
+        body: `Dear [NAME],<br><br>
+We confirm your appointment for <strong>NATIONAL ID CARD RENEWAL</strong> on <strong style="color:#1e3a8a;">[DATE] AT [TIME]</strong>.<br><br>
+<strong>Mandatory Requirements:</strong>
+<ol style="margin-left: 18px; margin-top: 6px; line-height: 1.6;">
+  <li><strong>Previous ID Card:</strong> Original copy or official loss/theft report.</li>
+  <li><strong>Proof of Address:</strong> Required if recording an overseas residential change.</li>
+  <li><strong>Fee:</strong> £13.00 approx. (Debit card only).</li>
+</ol>
+<br>
+Kind regards,<br>
+<strong>Consular Operations Section</strong>`
+      },
+      emergency_doc: {
+        subject: "APPOINTMENT CONFIRMATION: EMERGENCY TRAVEL DOCUMENT - [DATE] AT [TIME]",
+        body: `Dear [NAME],<br><br>
+We confirm your urgent appointment for an <strong>EMERGENCY TRAVEL DOCUMENT (ETD)</strong> on <strong style="color:#b91c1c;">[DATE] AT [TIME]</strong>.<br><br>
+<strong>Mandatory Requirements:</strong>
+<ol style="margin-left: 18px; margin-top: 6px; line-height: 1.6;">
+  <li><strong>Proof of Emergency & Travel Itinerary:</strong> Confirmed flight ticket departing within 72 hours.</li>
+  <li><strong>Photographs:</strong> 2 identical colour passport photos (35x45mm, white background).</li>
+  <li><strong>Identity Verification:</strong> Any secondary national identity proof (birth certificate, driving licence, expired passport).</li>
+  <li><strong>Fee:</strong> £60.00 approx.</li>
+</ol>
+<br>
+Kind regards,<br>
+<strong>Emergency Consular Case Unit</strong>`
+      }
+    },
+    es: {
+      adult_passport: {
+        subject: "CONFIRMACIÓN DE TURNO: RENOVACIÓN PASAPORTE MAYOR - [DATE] A LAS [TIME]",
+        body: `Estimado/a [NAME],<br><br>
+Confirmamos su cita para <strong>PASAPORTE BIOMÉTRICO (MAYOR)</strong> el día <strong style="color:#1e3a8a;">[DATE] A LAS [TIME]</strong>.<br><br>
+<strong>Requisitos Obligatorios:</strong>
+<ol style="margin-left: 18px; margin-top: 6px; line-height: 1.6;">
+  <li><strong>Pasaporte previo:</strong> Original (se anula para viajar; visados vigentes conservan validez).</li>
+  <li><strong>DNI físico:</strong> Último ejemplar tramitado.</li>
+  <li><strong>Arancel:</strong> £130.00 aprox. (Únicamente tarjeta de débito el día del turno).</li>
+</ol>
+<br>
+Saludos cordiales,<br>
+<strong>Sección Consular</strong>`
+      },
+      child_passport: {
+        subject: "CONFIRMACIÓN DE TURNO: PASAPORTE MENOR - [DATE] A LAS [TIME]",
+        body: `Estimado/a [NAME],<br><br>
+Confirmamos la cita para <strong>PASAPORTE DE MENOR</strong> el día <strong style="color:#1e3a8a;">[DATE] A LAS [TIME]</strong>.<br><br>
+<strong>Requisitos Obligatorios:</strong>
+<ol style="margin-left: 18px; margin-top: 6px; line-height: 1.6;">
+  <li><strong>Presencia obligatoria:</strong> Menor y ambos progenitores en persona.</li>
+  <li><strong>Partida de nacimiento:</strong> Copia integral original certificada.</li>
+  <li><strong>Identificación de progenitores:</strong> Documento de identidad o pasaporte original vigente.</li>
+  <li><strong>Arancel:</strong> £130.00 aprox. (Tarjeta de débito).</li>
+</ol>
+<br>
+Saludos cordiales,<br>
+<strong>Sección Consular</strong>`
+      },
+      id_renewal: {
+        subject: "CONFIRMACIÓN DE TURNO: RENOVACIÓN DE DNI - [DATE] A LAS [TIME]",
+        body: `Estimado/a [NAME],<br><br>
+Confirmamos su cita para <strong>RENOVACIÓN DE DNI</strong> el día <strong style="color:#1e3a8a;">[DATE] A LAS [TIME]</strong>.<br><br>
+<strong>Requisitos Obligatorios:</strong>
+<ol style="margin-left: 18px; margin-top: 6px; line-height: 1.6;">
+  <li><strong>DNI previo:</strong> Original o denuncia policial por extravío/robo.</li>
+  <li><strong>Arancel:</strong> £13.00 aprox. (Tarjeta de débito).</li>
+</ol>
+<br>
+Saludos cordiales,<br>
+<strong>Sección Consular</strong>`
+      },
+      emergency_doc: {
+        subject: "CONFIRMACIÓN DE TURNO: PASAPORTE DE EMERGENCIA - [DATE] A LAS [TIME]",
+        body: `Estimado/a [NAME],<br><br>
+Confirmamos su cita de urgencia para <strong>DOCUMENTO DE VIAJE DE EMERGENCIA</strong> el día <strong style="color:#b91c1c;">[DATE] A LAS [TIME]</strong>.<br><br>
+<strong>Requisitos Obligatorios:</strong>
+<ol style="margin-left: 18px; margin-top: 6px; line-height: 1.6;">
+  <li><strong>Comprobante de viaje:</strong> Billete de avión confirmado dentro de las próximas 72 hs.</li>
+  <li><strong>Fotos:</strong> 2 fotos carnet 4x4 fondo blanco.</li>
+  <li><strong>Acreditación de identidad:</strong> Cualquier documento oficial previo.</li>
+  <li><strong>Arancel:</strong> £60.00 aprox.</li>
+</ol>
+<br>
+Saludos cordiales,<br>
+<strong>Unidad Consular de Emergencias</strong>`
+      }
+    }
+  };
+
+  function generateEmail(type) {
+    const rawName = document.getElementById('applicantName').value.trim();
+    const displayName = rawName ? rawName.toUpperCase() : (currentLang === 'en' ? 'Applicant' : 'Solicitante');
+    const dateStr = formatDate(document.getElementById('appointmentDate').value, currentLang);
+
+    const tmpl = templates[currentLang][type];
+    const subject = tmpl.subject.replace('[DATE]', dateStr).replace('[TIME]', selectedTime);
+    const bodyHtml = tmpl.body.replace('[NAME]', displayName).replace('[DATE]', dateStr).replace('[TIME]', selectedTime);
+
+    const fullHtml = `
+      <div style="font-family: Arial, sans-serif; font-size: 15px; color: #0f172a; line-height: 1.5;">
+        <p style="font-size: 16px; font-weight: bold; color: #1e3a8a; margin-bottom: 16px;">${subject}</p>
+        ${bodyHtml}
+      </div>
+    `;
+
+    const plainText = `${subject}\n\n` + bodyHtml.replace(/<br\s*[\/]?>/gi, "\n").replace(/<[^>]+>/g, '');
+
+    if (navigator.clipboard && window.ClipboardItem) {
+      const blobHtml = new Blob([fullHtml], { type: "text/html" });
+      const blobText = new Blob([plainText], { type: "text/plain" });
+      navigator.clipboard.write([new ClipboardItem({ "text/html": blobHtml, "text/plain": blobText })])
+        .then(() => showToast())
+        .catch(() => fallbackCopy(plainText));
+    } else {
+      fallbackCopy(plainText);
+    }
+  }
+
+  function fallbackCopy(text) {
+    navigator.clipboard.writeText(text).then(() => showToast());
+  }
+
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 2200);
+  }
+</script>
+</body>
+</html>

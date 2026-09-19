@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEMO | Daily Intake Data Normalizer</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --accent: #059669;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 24px 16px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    .top-badge {
+      background: #0f172a; color: #94a3b8; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; padding: 6px 16px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;
+    }
+    .demo-tag { background: #3b82f6; color: white; padding: 2px 8px; border-radius: 4px; }
+
+    header {
+      background: var(--card-bg); padding: 20px 24px; border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
+    }
+    h1 { font-size: 1.35rem; color: var(--primary); font-weight: 800; }
+    p.sub { font-size: 0.88rem; color: var(--text-muted); }
+
+    .card { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border); margin-top: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04); }
+
+    .controls-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+    label { font-size: 0.88rem; font-weight: 700; color: #334155; }
+
+    textarea {
+      width: 100%; height: 150px; padding: 12px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-family: monospace; font-size: 0.84rem; line-height: 1.45; background: #fafafa; outline: none; margin-bottom: 14px;
+    }
+    textarea:focus { border-color: var(--primary); background: #fff; }
+
+    .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    button {
+      padding: 10px 18px; border-radius: 6px; font-size: 0.88rem; font-weight: 700; cursor: pointer; border: none; transition: 0.15s;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: #1e40af; }
+    .btn-sample { background: #e0e7ff; color: #3730a3; }
+    .btn-sample:hover { background: #c7d2fe; }
+    .btn-copy { background: var(--accent); color: white; }
+    .btn-copy:hover { background: #047857; }
+    .btn-clear { background: #e2e8f0; color: #475569; }
+
+    .table-container { margin-top: 20px; overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; display: none; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; text-align: left; }
+    th { background: #f8fafc; padding: 10px 14px; border-bottom: 2px solid var(--border); font-weight: 700; color: #334155; white-space: nowrap; }
+    td { padding: 9px 14px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+    tr:hover { background: #f8fafc; }
+
+    .badge { padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; text-align: center; display: inline-block; }
+    .badge-yes { background: #dcfce7; color: #15803d; }
+    .badge-no { background: #f1f5f9; color: #64748b; }
+
+    .toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: #0f172a; color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.88rem; display: none; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="top-badge">
+    <span>Internal Tooling Prototype</span>
+    <span class="demo-tag">DEMO</span>
+  </div>
+
+  <header>
+    <div>
+      <h1>Daily Intake Data Normalizer</h1>
+      <p class="sub">Clean parsing and validation of daily case entries for direct spreadsheet export</p>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="controls-row">
+      <label for="rawInput">Raw Daily Intake Stream:</label>
+      <div class="btn-group">
+        <button type="button" class="btn-sample" onclick="loadSampleData()">⚡ Load Sample Data</button>
+        <button type="button" class="btn-clear" onclick="clearData()">Clear</button>
+      </div>
+    </div>
+
+    <textarea id="rawInput" placeholder="Paste daily intake records or click 'Load Sample Data' to test..."></textarea>
+
+    <div class="btn-group">
+      <button type="button" class="btn-primary" onclick="processData()">Parse & Normalize Records</button>
+      <button type="button" class="btn-copy" id="btnCopyTable" style="display: none;" onclick="copyForExcel()">📋 Copy Table for Excel</button>
+    </div>
+
+    <div class="table-container" id="tableContainer">
+      <table>
+        <thead>
+          <tr>
+            <th>Intake Date</th>
+            <th>Case ID</th>
+            <th>Applicant ID</th>
+            <th>Full Legal Name</th>
+            <th>Service Stream</th>
+            <th style="text-align: center;">Requires ID?</th>
+            <th style="text-align: center;">Requires Passport?</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Copied table to clipboard!</div>
+
+<script>
+  let parsedRows = [];
+
+  // Sample data without fees, with clean services
+  const sampleRawText = `71004521 19/09/2026 ID: 29841022 SMITH, JOHN PASSPORT
+71004522 19/09/2026 ID: 34119842 BROWN, EMILY ID
+71004523 19/09/2026 ID: 48920114 DAVIS, OLIVER ID + PASSPORT
+71004524 19/09/2026 ID: 19482019 WILSON, SOPHIA EMERGENCY TRAVEL DOCUMENT
+71004525 19/09/2026 ID: 28491023 TAYLOR, JAMES FIRST ID REGISTRATION`;
+
+  function loadSampleData() {
+    document.getElementById('rawInput').value = sampleRawText.trim();
+    processData();
+  }
+
+  function clearData() {
+    document.getElementById('rawInput').value = '';
+    document.getElementById('tableContainer').style.display = 'none';
+    document.getElementById('btnCopyTable').style.display = 'none';
+    parsedRows = [];
+  }
+
+  // Pre-defined simple service list sorted by specificity
+  const KNOWN_SERVICES = [
+    { key: "EMERGENCY TRAVEL DOCUMENT", label: "EMERGENCY TRAVEL DOCUMENT", reqId: "NO", reqPass: "YES" },
+    { key: "FIRST ID REGISTRATION",    label: "FIRST ID REGISTRATION",    reqId: "YES", reqPass: "NO" },
+    { key: "ID + PASSPORT",            label: "ID + PASSPORT",            reqId: "YES", reqPass: "YES" },
+    { key: "ID & PASSPORT",            label: "ID + PASSPORT",            reqId: "YES", reqPass: "YES" },
+    { key: "PASSPORT",                 label: "PASSPORT",                 reqId: "NO", reqPass: "YES" },
+    { key: "ID",                       label: "ID",                       reqId: "YES", reqPass: "NO" }
+  ];
+
+  function processData() {
+    const raw = document.getElementById('rawInput').value.trim();
+    if (!raw) return;
+
+    const lines = raw.split(/\r?\n/);
+    parsedRows = [];
+
+    lines.forEach(line => {
+      let text = line.trim();
+      if (!text) return;
+
+      // 1. Extract Case ID (first word of digits)
+      let caseId = '7000' + Math.floor(Math.random() * 9000);
+      const caseMatch = text.match(/^(\d+)/);
+      if (caseMatch) {
+        caseId = caseMatch[1];
+        text = text.substring(caseMatch[0].length).trim();
+      }
+
+      // 2. Extract Date (DD/MM/YYYY)
+      let intakeDate = '19/09/2026';
+      const dateMatch = text.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+      if (dateMatch) {
+        intakeDate = dateMatch[1];
+        text = text.replace(dateMatch[0], '').trim();
+      }
+
+      // 3. Extract Applicant ID (e.g. "ID: 29841022" or "ID: -3554567")
+      let applicantId = '-';
+      const idMatch = text.match(/ID:\s*([A-Z0-9-]+)/i);
+      if (idMatch) {
+        applicantId = idMatch[1];
+        text = text.replace(idMatch[0], '').trim();
+      }
+
+      // 4. Identify Service Stream (matched strictly from known keys)
+      let serviceLabel = "OTHER";
+      let reqId = "NO";
+      let reqPass = "NO";
+      let foundServiceKey = null;
+
+      for (const s of KNOWN_SERVICES) {
+        // Look for service keyword at word boundary
+        const regex = new RegExp(`\\b${s.key.replace('+', '\\+')}\\b`, 'i');
+        if (regex.test(text)) {
+          serviceLabel = s.label;
+          reqId = s.reqId;
+          reqPass = s.reqPass;
+          foundServiceKey = s.key;
+          // Clean the service text out so it doesn't pollute the name
+          text = text.replace(regex, '').trim();
+          break;
+        }
+      }
+
+      // 5. The remaining text is purely the Full Legal Name
+      let name = text.replace(/\s+/g, ' ').trim();
+      if (!name) name = "UNKNOWN APPLICANT";
+
+      parsedRows.push({
+        date: intakeDate,
+        caseId: caseId,
+        applicantId: applicantId,
+        name: name,
+        service: serviceLabel,
+        reqId: reqId,
+        reqPass: reqPass
+      });
+    });
+
+    renderTable();
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = parsedRows.map(r => `
+      <tr>
+        <td>${r.date}</td>
+        <td style="font-family: monospace;">${r.caseId}</td>
+        <td style="font-family: monospace;">${r.applicantId}</td>
+        <td><strong>${r.name}</strong></td>
+        <td>${r.service}</td>
+        <td style="text-align: center;"><span class="badge ${r.reqId === 'YES' ? 'badge-yes' : 'badge-no'}">${r.reqId}</span></td>
+        <td style="text-align: center;"><span class="badge ${r.reqPass === 'YES' ? 'badge-yes' : 'badge-no'}">${r.reqPass}</span></td>
+      </tr>
+    `).join('');
+
+    document.getElementById('tableContainer').style.display = 'block';
+    document.getElementById('btnCopyTable').style.display = 'inline-block';
+  }
+
+  function copyForExcel() {
+    if (parsedRows.length === 0) return;
+    const tsv = parsedRows.map(r => [
+      r.date, r.caseId, r.applicantId, r.name, r.service, r.reqId, r.reqPass
+    ].join('\t')).join('\r\n');
+
+    navigator.clipboard.writeText(tsv).then(() => {
+      const t = document.getElementById('toast');
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2200);
+    });
+  }
+</script>
+</body>
+</html>
