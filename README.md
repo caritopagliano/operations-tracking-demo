@@ -27,3 +27,14 @@ An end-to-end operational framework designed to resolve citizen intake bottlenec
 ---
 
 ## 🏗️ Architecture & Operational Lifecycle
+
+```text
+[ Citizen Inquiry ] ➔ [ 1. Triage Assistant ] ➔ [ 2. Confirmation Generator ]
+                                                          │
+                                                    (Appointment)
+                                                          │
+[ Courier Pouch Arrives ] ➔ [ 3. Barcode Batch Intake ] ➔ [ 4. Matrix & Dashboard ]
+                                                          │
+                                                    (Handover)
+                                                          │
+                                            [ End-of-Day Slip Scanning ] ➔ [ ARCHIVED ]
